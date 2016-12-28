@@ -1,12 +1,13 @@
 package module5;
 
+import java.util.List;
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.PointFeature;
 import de.fhpotsdam.unfolding.geo.Location;
+import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import processing.core.PConstants;
 import processing.core.PGraphics;
-
 /** Implements a visual marker for cities on an earthquake map
  * 
  * @author UC San Diego Intermediate Software Development MOOC team
@@ -16,7 +17,10 @@ import processing.core.PGraphics;
 // TODO: Change SimplePointMarker to CommonMarker as the very first thing you do 
 // in module 5 (i.e. CityMarker extends CommonMarker).  It will cause an error.
 // That's what's expected.
-public class CityMarker extends SimplePointMarker {
+public class CityMarker extends CommonMarker {
+	
+	public float X;
+	public float Y;
 	
 	public static int TRI_SIZE = 5;  // The size of the triangle marker
 	
@@ -52,6 +56,25 @@ public class CityMarker extends SimplePointMarker {
 	{
 		
 		// TODO: Implement this method
+		int popupColor = pg.color(253, 237, 44);
+		int black = pg.color(0, 0, 0);
+		
+		int fontSize = 12;
+		
+		String text = String.format("City: %s, Country: %s, Population: %.2f Million",
+				getCity(), getCountry(), getPopulation());
+		float textWidth = pg.textWidth(text);
+		
+		
+		// popup box
+		pg.fill(popupColor);
+		pg.rect(x + TRI_SIZE, (y + TRI_SIZE) - fontSize, textWidth + 2, 14);
+
+		// popup text
+		pg.fill(black);
+		pg.stroke(black);
+		pg.textSize(fontSize);
+		pg.text(text, x + TRI_SIZE, y + TRI_SIZE);
 	}
 	
 	
@@ -71,5 +94,42 @@ public class CityMarker extends SimplePointMarker {
 	public float getPopulation()
 	{
 		return Float.parseFloat(getStringProperty("population"));
+	}
+
+	@Override
+	public void showThreats(List<Marker> earthquakeMarkers, List<Marker> cityMarkers){
+		// Hiding all the cities except this
+		for (Marker cityMarker: cityMarkers){
+			if (!this.equals(cityMarker)){
+				cityMarker.setHidden(true);
+			}
+		}
+		
+		// Hiding the earthquakes which don't effect this cityMarker
+		// City not threatened by an earthquake
+		// if distance between earthquakeMarker and CityMarker > threatCircle()
+		for (Marker earthquakeMarker: earthquakeMarkers){
+			double threat = ((EarthquakeMarker) earthquakeMarker).threatCircle();
+			if (earthquakeMarker.getDistanceTo(this.getLocation()) > threat){
+				earthquakeMarker.setHidden(true);
+			}
+		}
+	}
+	@Override
+	public void drawMarker(PGraphics pg, float x, float y) {
+		// TODO Auto-generated method stub
+		X = x;
+		Y = y;
+		
+		// Save previous drawing style
+		pg.pushStyle();
+		
+		// IMPLEMENT: drawing triangle for each city
+		pg.fill(150, 30, 30);
+		pg.triangle(x, y-TRI_SIZE, x-TRI_SIZE, y+TRI_SIZE, x+TRI_SIZE, y+TRI_SIZE);
+		
+		// Restore previous drawing style
+		pg.popStyle();
+		
 	}
 }

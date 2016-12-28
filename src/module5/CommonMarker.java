@@ -1,9 +1,10 @@
 package module5;
 
 import de.fhpotsdam.unfolding.geo.Location;
+import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import processing.core.PGraphics;
-
+import java.util.*;
 /** Implements a common marker for cities and earthquakes on an earthquake map
  * 
  * @author UC San Diego Intermediate Software Development MOOC team
@@ -48,4 +49,6 @@ public abstract class CommonMarker extends SimplePointMarker {
 	}
 	public abstract void drawMarker(PGraphics pg, float x, float y);
 	public abstract void showTitle(PGraphics pg, float x, float y);
+	public abstract void showThreats(List<Marker> quakeMarkers, List<Marker> cityMarkers);
+
 }

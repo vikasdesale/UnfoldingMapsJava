@@ -74,7 +74,7 @@ public class EarthquakeCityMap extends PApplet {
 			// IF YOU WANT TO TEST WITH A LOCAL FILE, uncomment the next line
 		    //earthquakesURL = "2.5_week.atom";
 		}
-		MapUtils.createDefaultEventDispatcher(this, map);
+	//	MapUtils.createDefaultEventDispatcher(this, map);
 		
 		
 		// (2) Reading in earthquake data and geometric properties
@@ -100,7 +100,7 @@ public class EarthquakeCityMap extends PApplet {
 		  }
 		  // OceanQuakes
 		  else {
-		    quakeMarkers.add(new OceanQuakeMarker(feature));
+		    quakeMarkers.add(new OceanQuakeMarker(feature,map));
 		  }
 	    }
 
@@ -146,6 +146,13 @@ public class EarthquakeCityMap extends PApplet {
 	private void selectMarkerIfHover(List<Marker> markers)
 	{
 		// TODO: Implement this method
+		for (Marker marker: markers){
+			if(marker.isInside(map, mouseX, mouseY)){
+				lastSelected = (CommonMarker) marker;
+				lastSelected.setSelected(true);
+				break;
+			}
+		}
 	}
 	
 	/** The event handler for mouse clicks
@@ -159,6 +166,37 @@ public class EarthquakeCityMap extends PApplet {
 		// TODO: Implement this method
 		// Hint: You probably want a helper method or two to keep this code
 		// from getting too long/disorganized
+		// instantly saving the x and y coordinates of the click
+				float x = mouseX;
+				float y = mouseY;
+				
+				// lastClicked tells us if it was clicked before
+				if (lastClicked != null) {
+					lastClicked.setClicked(false);
+					lastClicked = null;
+					unhideMarkers();
+				}
+				
+				if (MarkerClicked(quakeMarkers, x, y) ||	MarkerClicked(cityMarkers, x, y)){
+					hideMarkers();
+				}
+	}
+	
+	private void hideMarkers(){
+		lastClicked.showThreats(quakeMarkers, cityMarkers);
+	}
+	// If there was a marker underneath the mouse when it was clicked 
+	// it's clicked property is set to true
+	// returns true if the marker was found underneath it
+	private boolean MarkerClicked(List<Marker> markers, float x, float y){
+		for (Marker marker: markers){
+			if (marker.isInside(map, x, y)){
+				lastClicked = (CommonMarker) marker;
+				lastClicked.setClicked(true);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	
